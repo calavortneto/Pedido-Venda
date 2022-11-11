@@ -85,7 +85,7 @@ begin
     Active := False;
     SQL.Clear;
     SQL.Add('DELETE FROM pedidosvenda.produtos_pedido');
-    SQL.Add('WHERE id_produtos_pedido = ' + FidItem.ToString);
+    SQL.Add('WHERE id_produtos_pedido = ' + Itens.FieldByName('id_produtos_pedido').AsInteger.ToString);
     try
       ExecSQL;
       Result := True;
@@ -153,6 +153,7 @@ begin
             FItens.FieldByName('vl_quantidade').AsCurrency := FieldByName('vl_quantidade').AsCurrency;
             FItens.FieldByName('vl_unitario').AsCurrency := FieldByName('vl_unitario').AsCurrency;
             FItens.FieldByName('vl_total').AsCurrency := FieldByName('vl_total').AsCurrency;
+            FItens.FieldByName('ds_deletado').AsString := 'F';
             FItens.Post;
             Next;
           end;
@@ -182,6 +183,12 @@ begin
     Itens.First;
     while not Itens.Eof do
     begin
+      if Itens.FieldByName('ds_deletado').AsString = 'T' then
+      begin
+        DeleteItem;
+        Itens.Next;
+        Continue;
+      end;
       if Itens.FieldByName('id_produtos_pedido').AsInteger = 0 then
       begin
         InsertItem;

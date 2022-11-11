@@ -18,7 +18,7 @@ type
   TMovimento = (Inserindo, Alterando, Neutro);
 
   TForm_Principal = class(TForm)
-    StatusBar1: TStatusBar;
+    Informacao: TStatusBar;
     DBGrid1: TDBGrid;
     Label1: TLabel;
     edtNumeroPedido: TEdit;
@@ -72,6 +72,12 @@ type
       Shift: TShiftState);
     procedure edtNumeroPedidoExit(Sender: TObject);
     procedure btnRemoverPedidoClick(Sender: TObject);
+    procedure edtNumeroPedidoMouseEnter(Sender: TObject);
+    procedure edtNumeroPedidoMouseLeave(Sender: TObject);
+    procedure btnRemoverPedidoMouseEnter(Sender: TObject);
+    procedure btnRemoverPedidoMouseLeave(Sender: TObject);
+    procedure DBGrid1DrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
   private
     { Private declarations }
 
@@ -104,6 +110,15 @@ begin
     DBGrid1.SetFocus;
 end;
 
+procedure TForm_Principal.DBGrid1DrawColumnCell(Sender: TObject;
+  const Rect: TRect; DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  DBGrid1.Canvas.Font.Color := clBlack;
+  if cdsItensPedido.FieldByName('ds_deletado').AsString = 'T' then
+    DBGrid1.Canvas.Font.Color := clRed;
+  DBGrid1.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
 procedure TForm_Principal.DBGrid1Enter(Sender: TObject);
 begin
   KeyPreview := False;
@@ -126,6 +141,9 @@ end;
 procedure TForm_Principal.btnAlterarClick(Sender: TObject);
 begin
   if cdsItensPedido.IsEmpty then
+    Exit;
+
+  if cdsItensPedido.FieldByName('ds_deletado').AsString = 'T' then
     Exit;
 
   FMovimento := Alterando;
@@ -193,6 +211,7 @@ begin
     FieldByName('vl_quantidade').AsCurrency := StrToCurrDef(edtQuantidade.Text,0);
     FieldByName('vl_unitario').AsCurrency := StrToCurrDef(edtVlrUnitario.Text,0);
     FieldByName('vl_total').AsCurrency := StrToCurrDef(edtVlrTotal.Text,0);
+    FieldByName('ds_deletado').AsString := 'F';
     Post;
   end;
 
@@ -297,26 +316,20 @@ begin
   if cdsItensPedido.IsEmpty then
     Exit;
 
+  if cdsItensPedido.FieldByName('ds_deletado').AsString = 'T' then
+    Exit;
+
   if Application.MessageBox('Confirma a exclusão do produto selecionado?',
     'Pergunta', MB_ICONQUESTION + MB_YESNO) = idYes then
   begin
     if cdsItensPedido.FieldByName('id_produtos_pedido').AsInteger <> 0 then
     begin
-      try
-        Pedido := TPedido.Create;
-        Pedido.Numero := cdsItensPedido.FieldByName('id_numero_pedido').AsInteger;
-        Pedido.idItem := cdsItensPedido.FieldByName('id_produtos_pedido').AsInteger;
-        if not Pedido.DeleteItem then
-        begin
-          Application.MessageBox('Falha na exclusão do item.', 'Atenção',
-            MB_ICONWARNING + MB_OK);
-          Exit;
-        end;
-      finally
-        Pedido.Free;
-      end;
-    end;
-    cdsItensPedido.Delete;
+      cdsItensPedido.Edit;
+      cdsItensPedido.FieldByName('ds_deletado').AsString := 'T';
+      cdsItensPedido.Post;
+    end else
+      cdsItensPedido.Delete;
+
     TotalizarPedido;
   end;
 end;
@@ -345,6 +358,16 @@ begin
       Pedido.Free;
     end;
   end;
+end;
+
+procedure TForm_Principal.btnRemoverPedidoMouseEnter(Sender: TObject);
+begin
+  Informacao.Panels[0].Text := TBitBtn(Sender).Hint;
+end;
+
+procedure TForm_Principal.btnRemoverPedidoMouseLeave(Sender: TObject);
+begin
+  Informacao.Panels[0].Text := '';
 end;
 
 procedure TForm_Principal.edtCodigoClienteExit(Sender: TObject);
@@ -450,6 +473,16 @@ begin
     Key := #0;
 end;
 
+procedure TForm_Principal.edtNumeroPedidoMouseEnter(Sender: TObject);
+begin
+  Informacao.Panels[0].Text := TEdit(Sender).Hint;
+end;
+
+procedure TForm_Principal.edtNumeroPedidoMouseLeave(Sender: TObject);
+begin
+  Informacao.Panels[0].Text := '';
+end;
+
 procedure TForm_Principal.edtQuantidadeExit(Sender: TObject);
 var
   vlrQtde, vlrUnitario: Currency;
@@ -503,6 +536,7 @@ begin
   cdsItensPedido.FieldDefs.Add('vl_quantidade', ftCurrency);
   cdsItensPedido.FieldDefs.Add('vl_unitario', ftCurrency);
   cdsItensPedido.FieldDefs.Add('vl_total', ftCurrency);
+  cdsItensPedido.FieldDefs.Add('ds_deletado', ftString, 1);
   cdsItensPedido.CreateDataSet;
   cdsItensPedido.EmptyDataSet;
 
@@ -621,6 +655,11 @@ begin
     cdsTemp.First;
     while not cdsTemp.Eof do
     begin
+      if cdsTemp.FieldByName('ds_deletado').AsString = 'T' then
+      begin
+        cdsTemp.Next;
+        Continue;
+      end;
       vlrTotal := vlrTotal + cdsTemp.FieldByName('vl_total').AsCurrency;
       cdsTemp.Next;
     end;

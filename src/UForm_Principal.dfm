@@ -58,12 +58,15 @@ object Form_Principal: TForm_Principal
     Font.Style = [fsBold]
     ParentFont = False
   end
-  object StatusBar1: TStatusBar
+  object Informacao: TStatusBar
     Left = 0
     Top = 564
     Width = 854
     Height = 19
-    Panels = <>
+    Panels = <
+      item
+        Width = 500
+      end>
   end
   object DBGrid1: TDBGrid
     Tag = 1
@@ -78,6 +81,7 @@ object Form_Principal: TForm_Principal
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDrawColumnCell = DBGrid1DrawColumnCell
     OnEnter = DBGrid1Enter
     OnExit = DBGrid1Exit
     OnKeyDown = DBGrid1KeyDown
@@ -119,10 +123,17 @@ object Form_Principal: TForm_Principal
     Top = 26
     Width = 84
     Height = 23
+    Hint = 
+      'Ao digitar o n'#250'mero do pedido, o sistema ir'#225' verificar a exist'#234'n' +
+      'cia.'
     Alignment = taRightJustify
+    ParentShowHint = False
+    ShowHint = True
     TabOrder = 0
     OnExit = edtNumeroPedidoExit
     OnKeyPress = edtNumeroPedidoKeyPress
+    OnMouseEnter = edtNumeroPedidoMouseEnter
+    OnMouseLeave = edtNumeroPedidoMouseLeave
   end
   object MskDataEmissao: TMaskEdit
     Tag = 1
@@ -250,6 +261,8 @@ object Form_Principal: TForm_Principal
     ShowHint = True
     TabOrder = 5
     OnClick = btnNovoClick
+    OnMouseEnter = btnRemoverPedidoMouseEnter
+    OnMouseLeave = btnRemoverPedidoMouseLeave
   end
   object btnAlterar: TBitBtn
     Tag = 1
@@ -297,6 +310,8 @@ object Form_Principal: TForm_Principal
     ShowHint = True
     TabOrder = 6
     OnClick = btnAlterarClick
+    OnMouseEnter = btnRemoverPedidoMouseEnter
+    OnMouseLeave = btnRemoverPedidoMouseLeave
   end
   object btnRemover: TBitBtn
     Tag = 1
@@ -344,6 +359,8 @@ object Form_Principal: TForm_Principal
     ShowHint = True
     TabOrder = 7
     OnClick = btnRemoverClick
+    OnMouseEnter = btnRemoverPedidoMouseEnter
+    OnMouseLeave = btnRemoverPedidoMouseLeave
   end
   object pnlItensPedido: TPanel
     Tag = 1
@@ -602,5 +619,7 @@ object Form_Principal: TForm_Principal
     TabOrder = 1
     TabStop = False
     OnClick = btnRemoverPedidoClick
+    OnMouseEnter = btnRemoverPedidoMouseEnter
+    OnMouseLeave = btnRemoverPedidoMouseLeave
   end
 end
