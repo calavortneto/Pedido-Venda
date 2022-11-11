@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2022/11/08 17:11:57.000.342,=C:\Users\João Marcos\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:25:04.000.630,=C:\Users\João Marcos\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:25:49.000.515,D:\WK-Technology\Pedido de Venda\src\UForm_Principal.pas=C:\Users\João Marcos\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:25:49.000.515,D:\WK-Technology\Pedido de Venda\src\UForm_Principal.dfm=C:\Users\João Marcos\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2022/11/08 17:25:59.000.499,D:\WK-Technology\Pedido de Venda\src\PedidoVenda.dproj=C:\Users\João Marcos\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2022/11/08 17:26:56.000.621,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:27:32.000.947,D:\WK-Technology\Pedido de Venda\src\UDM.pas=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/08 17:27:32.000.947,D:\WK-Technology\Pedido de Venda\src\UDM.dfm=D:\WK-Technology\Pedido de Venda\src\Unit1.dfm</Transaction>
+    <Transaction>2022/11/09 14:21:08.000.682,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 14:21:36.000.251,D:\WK-Technology\Pedido de Venda\src\UClasse.Conexao.pas=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 21:23:19.000.261,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 21:30:32.000.818,D:\WK-Technology\Pedido de Venda\src\UClasse.Conexao.pas=</Transaction>
+    <Transaction>2022/11/09 21:30:54.000.338,=D:\WK-Technology\Pedido de Venda\src\classes\UClasse.Conexao.pas</Transaction>
+    <Transaction>2022/11/09 21:49:59.000.404,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 21:50:21.000.601,D:\WK-Technology\Pedido de Venda\src\classes\UClasse.Controle.pas=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 22:11:46.000.595,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 22:12:07.000.692,D:\WK-Technology\Pedido de Venda\src\classes\UClasse.Cadastro.Cliente.pas=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 22:12:11.000.453,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 22:12:22.000.834,D:\WK-Technology\Pedido de Venda\src\UClasse.Cadastro.Produto.pas=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/09 23:28:46.000.967,D:\WK-Technology\Pedido de Venda\src\UDM.pas=</Transaction>
+    <Transaction>2022/11/10 13:36:20.000.147,=D:\WK-Technology\Pedido de Venda\src\Unit1.pas</Transaction>
+    <Transaction>2022/11/10 13:37:17.000.598,D:\WK-Technology\Pedido de Venda\src\Unit1.pas=D:\WK-Technology\Pedido de Venda\src\classes\UClasse.Movimento.Pedido.pas</Transaction>
+    <Transaction>2022/11/10 13:37:24.000.691,D:\WK-Technology\Pedido de Venda\src\UClasse.Cadastro.Produto.pas=</Transaction>
+    <Transaction>2022/11/10 13:37:57.000.724,=D:\WK-Technology\Pedido de Venda\src\classes\UClasse.Cadastro.Produto.pas</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,135 @@
+unit UClasse.Conexao;
+
+interface
+
+uses
+  System.SysUtils, System.Classes, FireDAC.Stan.Intf, FireDAC.Stan.Option,
+  FireDAC.Stan.Error, FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
+  FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.Phys.FBDef,
+  FireDAC.Phys.MSSQLDef, FireDAC.VCLUI.Wait, FireDAC.Comp.UI,
+  FireDAC.Phys.ODBCBase, FireDAC.Phys.MSSQL, FireDAC.Phys.IBBase,
+  FireDAC.Phys.FB, Data.DB, FireDAC.Comp.Client, FireDAC.Phys.MySQL,
+  FireDAC.Phys.MySQLDef, IniFiles;
+
+type
+  TConexao = class
+    private
+      FConexao: TFDConnection;
+      FDatabase: String;
+      FServer: String;
+      FUserName: String;
+      FPassword: String;
+      FPort: String;
+      FDriver: String;
+      FMsgErro: String;
+      FMySQLDriver: TFDPhysMySQLDriverLink;
+      FWaitCursor: TFDGUIxWaitCursor;
+
+    public
+      constructor Create(Conexao: TFDConnection);
+      destructor Destroy; override;
+
+      function AtivarConexao: Boolean;
+      function LerConfiguracao: Boolean;
+
+      property Conexao: TFDConnection read FConexao Write FConexao;
+      property Database: String read FDatabase Write FDatabase;
+      property Server:  String read FServer Write FServer;
+      property UserName:  String read FUserName Write FUserName;
+      property Password:  String read FPassword Write FPassword;
+      property Port:  String read FPort Write FPort;
+      property Driver:  String read FDriver Write FDriver;
+      property MsgErro:  String read FMsgErro Write FMsgErro;
+
+  end;
+
+implementation
+
+{ TConexao }
+
+function TConexao.AtivarConexao: Boolean;
+begin
+  Result := False;
+  if LerConfiguracao then
+  begin
+    FConexao.Params.Clear;
+    FConexao.Params.Add('Database=' + FDatabase);
+    FConexao.Params.Add('Server=' + FServer);
+    FConexao.Params.Add('User_Name=' + FUserName);
+    FConexao.Params.Add('Password=' + FPassword);
+    FConexao.Params.Add('DriverID=' + FDriver);
+    FConexao.LoginPrompt := False;
+    try
+      FConexao.Connected := True;
+    except
+      on e:Exception do
+      begin
+        FMsgErro := e.Message;
+      end;
+    end;
+  end else
+  begin
+    FMsgErro := 'Arquivo de configuração "PedidoVenda.ini" não encontrado.'
+  end;
+end;
+
+constructor TConexao.Create(Conexao: TFDConnection);
+begin
+  if not Assigned(FMySQLDriver) then
+  begin
+    FConexao := Conexao;
+  end;
+
+  if not Assigned(FMySQLDriver) then
+  begin
+    FMySQLDriver := TFDPhysMySQLDriverLink.Create(nil);
+    FMySQLDriver.VendorLib := ParamStr(0) + 'libmysql.dll';
+  end;
+
+  if not Assigned(FWaitCursor) then
+  begin
+    FWaitCursor := TFDGUIxWaitCursor.Create(nil);
+    FWaitCursor.Provider := 'Forms';
+  end;
+end;
+
+destructor TConexao.Destroy;
+begin
+  if Assigned(FMySQLDriver) then
+    FreeAndNil(FMySQLDriver);
+
+  if Assigned(FWaitCursor) then
+    FreeAndNil(FWaitCursor);
+
+  if Assigned(FConexao) then
+  begin
+    FConexao.Connected := False;
+    FreeAndNil(FConexao);
+  end;
+
+  inherited;
+end;
+
+function TConexao.LerConfiguracao: Boolean;
+begin
+  //if not FileExists(ParamStr(0) + 'PedidoVenda.ini') then
+  //begin
+  //  Result := False;
+  //  Exit;
+  //end;
+
+  with TIniFile.Create(ParamStr(0) + 'PedidoVenda.ini') do
+  try
+    FDatabase := ReadString('Configuracao', 'Base', 'pedidosvenda');
+    FServer := ReadString('Configuracao', 'Server', 'localhost');
+    FUserName := ReadString('Configuracao', 'User', 'root');
+    FPassword := ReadString('Configuracao', 'Password', 'result');
+    FPort := ReadString('Configuracao', 'Port', '3306');
+    FDriver := ReadString('Configuracao', 'Driver', 'MySQL');
+  finally
+    Free;
+    Result := True;
+  end;
+end;
+
+end.

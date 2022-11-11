@@ -1,0 +1,141 @@
+unit UClasse.Cadastro.Cliente;
+
+interface
+
+uses
+  Windows, SysUtils, Classes, Controls, Forms, ComCtrls, UClasse.Controle;
+
+type
+  TCliente = class
+    private
+      FCodigo: Integer;
+      FNome : String;
+      FCidade: String;
+      FEstado: String;
+      FControle: TControle;
+
+    public
+      constructor Create;
+      destructor Destroy; override;
+
+      function Insert: Boolean;
+      function Update: Boolean;
+      function Delete: Boolean;
+      function Exists: Boolean;
+
+      property Codigo: Integer read FCodigo write FCodigo;
+      property Nome: String read FNome write FNome;
+      property Cidade: String read FCidade write FCidade;
+      property Estado: String read FEstado write FEstado;
+  end;
+
+implementation
+
+{ TCliente }
+
+constructor TCliente.Create;
+begin
+  FControle := TControle.Create;
+end;
+
+function TCliente.Delete: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('DELETE FROM `pedidosvenda`.`clientes`');
+    SQL.Add('WHERE id_cliente = ' + FCodigo.ToString);
+    try
+      ExecSQL;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+destructor TCliente.Destroy;
+begin
+  FControle.Free;
+  inherited;
+end;
+
+function TCliente.Exists: Boolean;
+begin
+  Result := False;
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('SELECT `clientes`.`id_cliente`,');
+    SQL.Add('       `clientes`.`ds_cliente`,');
+    SQL.Add('       `clientes`.`ds_cliente`,');
+    SQL.Add('       `clientes`.`ds_cliente` ');
+    SQL.Add('  FROM `pedidosvenda`.`clientes`');
+    SQL.Add(' WHERE `clientes`.`id_cliente` = ' + FCodigo.ToString);
+    Active := True;
+    if not IsEmpty then
+    begin
+      FNome  := FieldByName('ds_cliente').AsString;
+      Result := True;
+    end;
+  end;
+end;
+
+function TCliente.Insert: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('INSERT INTO `pedidosvenda`.`clientes`');
+    SQL.Add('(`id_cliente`,`ds_cliente`,`ds_cidade`,`ds_uf`)');
+    SQL.Add('VALUES(');
+    SQL.Add(FCodigo.ToString + ',');
+    SQL.Add(QuotedStr(FNome) + ',');
+    SQL.Add(QuotedStr(FCidade) + ',');
+    SQL.Add(QuotedStr(FEstado));
+    SQL.Add(')');
+    try
+      ExecSQL;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TCliente.Update: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('UPDATE `pedidosvenda`.`clientes`');
+    SQL.Add('   SET `ds_cliente` = ' + QuotedStr(FNome) + ',');
+    SQL.Add('       `ds_cidade` = ' + QuotedStr(FCidade) + ',');
+    SQL.Add('       `ds_uf` = ' + QuotedStr(FEstado));
+    SQL.Add(' WHERE `id_cliente` = ' + FCodigo.ToString);
+    try
+      ExecSQL;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+end.

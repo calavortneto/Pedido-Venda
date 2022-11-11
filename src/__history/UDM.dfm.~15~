@@ -1,0 +1,30 @@
+object DM: TDM
+  Height = 480
+  Width = 640
+  object Conexao: TFDConnection
+    Params.Strings = (
+      'Database=pedidosvenda'
+      'User_Name=root'
+      'Password=result'
+      'Server=localhost'
+      'DriverID=MySQL')
+    LoginPrompt = False
+    Left = 64
+    Top = 88
+  end
+  object WaitCursor: TFDGUIxWaitCursor
+    Provider = 'Forms'
+    Left = 280
+    Top = 88
+  end
+  object MySQLDriverLink: TFDPhysMySQLDriverLink
+    VendorLib = 'D:\WK-Technology\Pedido de Venda\libmysql.dll'
+    Left = 168
+    Top = 88
+  end
+  object FDQuery1: TFDQuery
+    Connection = Conexao
+    Left = 96
+    Top = 184
+  end
+end

@@ -1,0 +1,124 @@
+unit UClasse.Cadastro.Produto;
+
+interface
+
+uses
+  Windows, SysUtils, Classes, Controls, Forms, ComCtrls, UClasse.Controle;
+
+type
+  TProduto = class
+    private
+      FCodigo: Integer;
+      FNome : String;
+      FPreco: Currency;
+      FControle: TControle;
+
+    public
+      constructor Create(pConexao: TControle);
+      destructor Destroy; override;
+
+      function Insert: Boolean;
+      function Update: Boolean;
+      function Delete: Boolean;
+
+      property Codigo: Integer read FCodigo write FCodigo;
+      property Nome: String read FNome write FNome;
+      property Preco: Currency read FPreco write FPreco;
+
+  end;
+
+implementation
+
+{ TProduto }
+
+constructor TProduto.Create(pConexao: TControle);
+begin
+  FControle := pConexao;
+end;
+
+function TProduto.Delete: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('DELETE FROM `pedidosvenda`.`produtos`');
+    SQL.Add('WHERE id_produto = ' + FCodigo.ToString);
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+destructor TProduto.Destroy;
+begin
+  //
+  inherited;
+end;
+
+function TProduto.Insert: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('INSERT INTO `pedidosvenda`.`produtos`');
+    SQL.Add('(`id_produto`,`ds_produto`,`vl_preco`)');
+    SQL.Add('VALUES(');
+    SQL.Add(FCodigo.ToString + ',');
+    SQL.Add(QuotedStr(FNome) + ',');
+    SQL.Add(FloatToSTrf(FPreco,ffCurrency,15,2));
+    SQL.Add(')');
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TProduto.Update: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('UPDATE `pedidosvenda`.`produtos`');
+    SQL.Add('   SET `ds_produto` = ' + QuotedStr(FNome) + ',');
+    SQL.Add('       `vl_preco` = ' + FloatToSTrf(FPreco,ffCurrency,15,2));
+    SQL.Add(' WHERE `id_produto` = ' + FCodigo.ToString);
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+end.

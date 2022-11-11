@@ -1,0 +1,18 @@
+program PedidoVenda;
+
+uses
+  Vcl.Forms,
+  UForm_Principal in 'UForm_Principal.pas' {Form_Principal},
+  UDM in 'UDM.pas' {DM: TDataModule},
+  UClasse.Conexao in 'classes\UClasse.Conexao.pas',
+  UClasse.Controle in 'classes\UClasse.Controle.pas';
+
+{$R *.res}
+
+begin
+  Application.Initialize;
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TForm_Principal, Form_Principal);
+  Application.CreateForm(TDM, DM);
+  Application.Run;
+end.

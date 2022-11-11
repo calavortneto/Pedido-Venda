@@ -1,0 +1,332 @@
+unit UClasse.Movimento.Pedido;
+
+interface
+
+uses
+  Windows, SysUtils, Classes, Controls, Forms, ComCtrls, Datasnap.DBClient,
+  UClasse.Controle;
+
+type
+  TPedido = class
+    private
+      FNumero: Integer;
+      FidCliente: Integer;
+      FdsCliente: String;
+      FDtEmissao: TDateTime;
+      FVlrTotal: Currency;
+      FItens: TClientDataSet;
+      FidItem: Integer;
+      FRetItens: Boolean;
+      FControle: TControle;
+
+    public
+      constructor Create;
+      destructor Destroy; override;
+
+      function Format(Valor: String): String;
+      function Insert: Boolean;
+      function Update: Boolean;
+      function Delete: Boolean;
+      function Exists: Boolean;
+      function NewNum: Integer;
+      function Post: Boolean;
+
+      function InsertItem: Boolean;
+      function UpdateItem: Boolean;
+      function DeleteItem: Boolean;
+
+      property Numero: Integer read FNumero write FNumero;
+      property idCliente: Integer read FidCliente write FidCliente;
+      property dsCliente: String read FdsCliente write FdsCliente;
+      property DtEmissao: TDateTime read FDtEmissao write FDtEmissao;
+      property VlrTotal: Currency read FVlrTotal write FVlrTotal;
+      property Itens: TClientDataSet read FItens write FItens;
+      property idItem: Integer read FidItem write FidItem;
+      property RetItens: Boolean read FRetItens write FRetItens;
+
+  end;
+
+implementation
+
+{ TPedido }
+
+constructor TPedido.Create;
+begin
+  FControle := TControle.Create;
+  FVlrTotal := 0;
+  FRetItens := False;
+end;
+
+function TPedido.Delete: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('DELETE FROM pedidosvenda.dados_gerais_pedido');
+    SQL.Add('WHERE id_numero_pedido = ' + FNumero.ToString);
+    try
+      ExecSQL;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TPedido.DeleteItem: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('DELETE FROM pedidosvenda.produtos_pedido');
+    SQL.Add('WHERE id_produtos_pedido = ' + FidItem.ToString);
+    try
+      ExecSQL;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+destructor TPedido.Destroy;
+begin
+  FControle.Free;
+  inherited;
+end;
+
+function TPedido.Exists: Boolean;
+begin
+  Result := False;
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('SELECT p.*, c.ds_cliente ');
+    SQL.Add('  FROM pedidosvenda.dados_gerais_pedido p');
+    SQL.Add(' INNER JOIN pedidosvenda.clientes c');
+    SQL.Add('    ON c.id_cliente = p.id_cliente');
+    SQL.Add(' WHERE p.id_numero_pedido = '+ FNumero.ToString);
+    Active := True;
+    if not IsEmpty then
+    begin
+      Result := True;
+      if RetItens then
+      begin
+        FidCliente := FieldByName('id_cliente').AsInteger;
+        FdsCliente := FieldByName('ds_cliente').AsString;
+        FDtEmissao := FieldByName('dt_emissao').AsDateTime;
+        FVlrTotal := FieldByName('vl_total').AsCurrency;
+      end;
+      if Assigned(FItens) and (FRetItens) then
+      begin
+        Active := False;
+        SQL.Clear;
+        SQL.Add('SELECT p1.*, p2.ds_produto');
+        SQL.Add('  FROM pedidosvenda.produtos_pedido p1');
+        SQL.Add(' INNER JOIN pedidosvenda.produtos p2');
+        SQL.Add('    ON p2.id_produto = p1.id_produto');
+        SQL.Add(' WHERE id_numero_pedido = '+ FNumero.ToString);
+        SQL.Add(' ORDER BY id_produtos_pedido');
+        Active := True;
+        if not IsEmpty then
+        begin
+          FItens.EmptyDataSet;
+          First;
+          while not Eof do
+          begin
+            FItens.Append;
+            FItens.FieldByName('id_produtos_pedido').AsInteger := FieldByName('id_produtos_pedido').AsInteger;
+            FItens.FieldByName('id_numero_pedido').AsInteger := FieldByName('id_numero_pedido').AsInteger;
+            FItens.FieldByName('id_produto').AsInteger := FieldByName('id_produto').AsInteger;
+            FItens.FieldByName('ds_produto').AsString := FieldByName('ds_produto').AsString;
+            FItens.FieldByName('vl_quantidade').AsCurrency := FieldByName('vl_quantidade').AsCurrency;
+            FItens.FieldByName('vl_unitario').AsCurrency := FieldByName('vl_unitario').AsCurrency;
+            FItens.FieldByName('vl_total').AsCurrency := FieldByName('vl_total').AsCurrency;
+            FItens.Post;
+            Next;
+          end;
+        end;
+      end;
+    end;
+  end;
+end;
+
+function TPedido.Format(Valor: String): String;
+begin
+  { Retirar o Ponto da String }
+  Result := StringReplace(Valor,'.','',[rfReplaceAll]);
+  { Trocar a Virgula por Ponto }
+  Result := StringReplace(Result,',','.',[rfReplaceAll]);  
+end;
+
+function TPedido.Post: Boolean;
+begin
+  if not Exists then
+    Result := Insert
+  else
+    Result := Update;
+
+  if (Result) and (not Itens.IsEmpty) then
+  begin
+    Itens.First;
+    while not Itens.Eof do
+    begin
+      if Itens.FieldByName('id_produtos_pedido').AsInteger = 0 then
+      begin
+        InsertItem;
+      end else
+      begin
+        UpdateItem;
+      end;
+      Itens.Next;
+    end;
+  end;
+end;
+
+function TPedido.Insert: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('INSERT INTO pedidosvenda.dados_gerais_pedido');
+    SQL.Add('(id_numero_pedido,id_cliente,dt_emissao,vl_total)');
+    SQL.Add('VALUES(');
+    SQL.Add(FNumero.ToString + ',');
+    SQL.Add(FidCliente.ToString + ',');
+    SQL.Add(QuotedStr(FormatDateTime('yyyy/mm/dd', FDtEmissao)) + ',');
+    SQL.Add(Format(FormatFloat('#,##0.00',FVlrTotal)));
+    SQL.Add(')');
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TPedido.InsertItem: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('INSERT INTO pedidosvenda.produtos_pedido');
+    SQL.Add('(id_numero_pedido,id_produto,vl_quantidade,vl_unitario,vl_total)');
+    SQL.Add('VALUES(');
+    SQL.Add(Itens.FieldByName('id_numero_pedido').AsInteger.ToString + ',');
+    SQL.Add(Itens.FieldByName('id_produto').AsInteger.ToString + ',');
+    SQL.Add(Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_quantidade').AsCurrency)) + ',');
+    SQL.Add(Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_unitario').AsCurrency)) + ',');
+    SQL.Add(Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_total').AsCurrency)));
+    SQL.Add(')');
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TPedido.NewNum: Integer;
+begin
+  Result := 1;
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add(' SELECT id_numero_pedido ');
+    SQL.Add('   FROM pedidosvenda.dados_gerais_pedido');
+    SQL.Add('  ORDER BY id_numero_pedido DESC');
+    SQL.Add('  LIMIT 1');
+    Active := True;
+    if not IsEmpty then
+      Result := FieldByName('id_numero_pedido').AsInteger + 1;
+  end;
+end;
+
+function TPedido.Update: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('UPDATE pedidosvenda.dados_gerais_pedido');
+    SQL.Add('   SET id_cliente = ' + FidCliente.ToString + ',');
+    SQL.Add('       dt_emissao = ' + QuotedStr(FormatDateTime('yyyy/mm/dd',
+      FDtEmissao)) + ',');
+    SQL.Add('       vl_total = ' + Format(FormatFloat('#,##0.00',FVlrTotal)));
+    SQL.Add(' WHERE id_numero_pedido = ' + FNumero.ToString);
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+function TPedido.UpdateItem: Boolean;
+begin
+  with FControle.Query do
+  begin
+    Active := False;
+    SQL.Clear;
+    SQL.Add('UPDATE pedidosvenda.produtos_pedido');
+    SQL.Add('   SET id_numero_pedido = ' + Itens.FieldByName('id_numero_pedido').AsInteger.ToString + ',');
+    SQL.Add('       id_produto = ' + Itens.FieldByName('id_produto').AsInteger.ToString + ',');
+    SQL.Add('       vl_quantidade = ' + Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_quantidade').AsCurrency)) + ',');
+    SQL.Add('       vl_unitario = ' + Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_unitario').AsCurrency)) + ',');
+    SQL.Add('       vl_total = ' + Format(FormatFloat('#,##0.00',Itens.FieldByName('vl_total').AsCurrency)));
+    SQL.Add(' WHERE id_produtos_pedido = ' + Itens.FieldByName('id_numero_pedido').AsInteger.ToString);
+    try
+      Connection.StartTransaction;
+      ExecSQL;
+      Connection.Commit;
+      Result := True;
+    except
+      on e:exception do
+      begin
+        Result := False;
+        Connection.Rollback;
+        FControle.MsgErro := e.Message;
+      end;
+    end;
+  end;
+end;
+
+end.
