@@ -1,5 +1,4 @@
 program PedidoVenda;
-
 uses
   Vcl.Forms,
   UForm_Principal in 'UForm_Principal.pas' {Form_Principal},
@@ -7,10 +6,10 @@ uses
   UClasse.Controle in 'classes\UClasse.Controle.pas',
   UClasse.Cadastro.Cliente in 'classes\UClasse.Cadastro.Cliente.pas',
   UClasse.Movimento.Pedido in 'classes\UClasse.Movimento.Pedido.pas',
-  UClasse.Cadastro.Produto in 'classes\UClasse.Cadastro.Produto.pas';
+  UClasse.Cadastro.Produto in 'classes\UClasse.Cadastro.Produto.pas',
+  UFuncoes in 'UFuncoes.pas';
 
 {$R *.res}
-
 begin
   ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;

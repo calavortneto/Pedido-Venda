@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, SysUtils, Classes, Controls, Forms, ComCtrls, Datasnap.DBClient,
-  UClasse.Controle;
+  UClasse.Controle, UFuncoes;
 
 type
   TPedido = class
@@ -23,7 +23,6 @@ type
       constructor Create;
       destructor Destroy; override;
 
-      function Format(Valor: String): String;
       function Insert: Boolean;
       function Update: Boolean;
       function Delete: Boolean;
@@ -161,14 +160,6 @@ begin
       end;
     end;
   end;
-end;
-
-function TPedido.Format(Valor: String): String;
-begin
-  { Retirar o Ponto da String }
-  Result := StringReplace(Valor,'.','',[rfReplaceAll]);
-  { Trocar a Virgula por Ponto }
-  Result := StringReplace(Result,',','.',[rfReplaceAll]);  
 end;
 
 function TPedido.Post: Boolean;

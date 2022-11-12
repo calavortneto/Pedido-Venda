@@ -11,7 +11,9 @@ uses
   UClasse.Controle,
   UClasse.Cadastro.Cliente,
   UClasse.Cadastro.Produto,
-  UClasse.Movimento.Pedido;
+  UClasse.Movimento.Pedido,
+
+  UFuncoes;
 
 type
   TFuncao = (Habilitar, Desabilitar);
@@ -89,6 +91,8 @@ type
     procedure LimparProduto;
     procedure NovoPedido;
     procedure TotalizarPedido;
+
+    function TiraPonto(Valor: String): String;
 
   public
     { Public declarations }
@@ -176,7 +180,7 @@ begin
     Exit;
   end;
 
-  if StrToCurrDef(edtQuantidade.Text,0) = 0 then
+  if StrToCurrDef(TiraPonto(edtQuantidade.Text),0) = 0 then
   begin
     Application.MessageBox('Quantidade deve ser informada.', 'Atenção',
       MB_ICONWARNING + MB_OK);
@@ -185,7 +189,7 @@ begin
     Exit;
   end;
 
-  if StrToCurrDef(edtVlrUnitario.Text,0) = 0 then
+  if StrToCurrDef(TiraPonto(edtVlrUnitario.Text),0) = 0 then
   begin
     Application.MessageBox('Vlr. Unitário deve ser informado.', 'Atenção',
       MB_ICONWARNING + MB_OK);
@@ -208,9 +212,9 @@ begin
     begin
       Edit;
     end;
-    FieldByName('vl_quantidade').AsCurrency := StrToCurrDef(edtQuantidade.Text,0);
-    FieldByName('vl_unitario').AsCurrency := StrToCurrDef(edtVlrUnitario.Text,0);
-    FieldByName('vl_total').AsCurrency := StrToCurrDef(edtVlrTotal.Text,0);
+    FieldByName('vl_quantidade').AsCurrency := StrToCurrDef(TiraPonto(edtQuantidade.Text),0);
+    FieldByName('vl_unitario').AsCurrency := StrToCurrDef(TiraPonto(edtVlrUnitario.Text),0);
+    FieldByName('vl_total').AsCurrency := StrToCurrDef(TiraPonto(edtVlrTotal.Text),0);
     FieldByName('ds_deletado').AsString := 'F';
     Post;
   end;
@@ -488,11 +492,9 @@ var
   vlrQtde, vlrUnitario: Currency;
 begin
   vlrQtde := 0;
-  vlrQtde := StrToCurrDef(StringReplace(edtQuantidade.Text,'.','',
-    [rfReplaceAll]), 0);
+  vlrQtde := StrToCurrDef(TiraPonto(edtQuantidade.Text), 0);
   vlrUnitario := 0;
-  vlrUnitario := StrToCurrDef(StringReplace(edtVlrUnitario.Text,'.','',
-    [rfReplaceAll]), 0);
+  vlrUnitario := StrToCurrDef(TiraPonto(edtVlrUnitario.Text), 0);
   edtQuantidade.Text := FormatFloat('#,##0.00', vlrQtde);
   edtVlrUnitario.Text := FormatFloat('#,##0.00', vlrUnitario);
   edtVlrTotal.Text := FormatFloat('#,##0.00', vlrQtde * vlrUnitario);
@@ -635,6 +637,12 @@ begin
 
   if edtNumeroPedido.CanFocus then
     edtNumeroPedido.SetFocus;
+end;
+
+function TForm_Principal.TiraPonto(Valor: String): String;
+begin
+  { Retirar o Ponto da String }
+  Result := StringReplace(Valor,'.','',[rfReplaceAll]);
 end;
 
 procedure TForm_Principal.TotalizarPedido;

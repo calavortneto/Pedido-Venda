@@ -3,7 +3,8 @@ unit UClasse.Cadastro.Produto;
 interface
 
 uses
-  Windows, SysUtils, Classes, Controls, Forms, ComCtrls, UClasse.Controle;
+  Windows, SysUtils, Classes, Controls, Forms, ComCtrls, UClasse.Controle,
+  UFuncoes;
 
 type
   TProduto = class
@@ -17,7 +18,6 @@ type
       constructor Create;
       destructor Destroy; override;
 
-      function Format(Valor: String): String;
       function Insert: Boolean;
       function Update: Boolean;
       function Delete: Boolean;
@@ -88,14 +88,6 @@ begin
       Result := True;
     end;
   end;
-end;
-
-function TProduto.Format(Valor: String): String;
-begin
-  { Retirar o Ponto da String }
-  Result := StringReplace(Valor,'.','',[rfReplaceAll]);
-  { Trocar a Virgula por Ponto }
-  Result := StringReplace(Result,',','.',[rfReplaceAll]);
 end;
 
 function TProduto.Insert: Boolean;

@@ -113,6 +113,7 @@
         <DCCReference Include="classes\UClasse.Cadastro.Cliente.pas"/>
         <DCCReference Include="classes\UClasse.Movimento.Pedido.pas"/>
         <DCCReference Include="classes\UClasse.Cadastro.Produto.pas"/>
+        <DCCReference Include="UFuncoes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
