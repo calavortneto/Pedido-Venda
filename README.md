@@ -62,6 +62,6 @@ para carregar pedidos já gravados. Solicitar (número do pedido) e carregar o c
 para cancelar um pedido. Solicitar (número do pedido) e apagar as duas tabelas.
 
 Critérios
-1. Utilizado MySQL como banco de dados
-2. Utilizado conceitos de orientação a objetos, criando classes por exemplo
-3. Não utilizado componentes de terceiros, focando sempre o que é nativo da IDE
+1. Utilizado MySQL como banco de dados.
+2. Utilizado conceitos de orientação a objetos.
+3. Não utilizado componentes de terceiros, focando sempre no que é nativo da IDE.
